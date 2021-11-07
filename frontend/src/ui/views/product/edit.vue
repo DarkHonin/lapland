@@ -56,40 +56,38 @@
                         <v-textarea name='productDescription' v-model="product.description" no-resize filled label='Product Description' />
                     </v-col>
                     <v-col>
-                        <h4>Purchace</h4>
-                        <v-radio-group>
-                            <v-radio v-for='(option, index) in product.options' :key='index' :value='index'>
-                                <template v-slot:label>
-                                    <span>{{option.label}}</span> <v-spacer/> <span>${{option.value}}</span>
-                                </template>
-                            </v-radio>
-                        </v-radio-group>
-                        <v-row v-if='addingOption'>
-                            <v-text-field
-                                v-model="newOption.label"
-                                name="option_label"
-                                label="Option label"
-                            ></v-text-field>
-                            <v-spacer></v-spacer>
-                            <v-text-field
-                                v-model="newOption.value"
-                                name="option_value"
-                                label="Option value"
-                            ></v-text-field>
-                        </v-row>
-                        <v-btn @click='createOption'>
-                            <div v-if='!addingOption'>
-                                <v-icon>mdi-plus</v-icon>
-                                Add option
-                            </div>
-                            <div v-else>
-                                Save
-                            </div>
-                        </v-btn>
+                        <h4>Options</h4>
+                        <Option class='option' :option='option' v-for='(option, key) in product.options' :key='key'>
+                            <template v-slot:actions>
+                                <v-icon @click='promptOptionDelete(key)' color='error'>mdi-delete</v-icon>
+                            </template>
+
+                        </Option>
+                        <CreateOption class='option' @submit='(v) => saveOption(v)'/>
                     </v-col>
                 </v-row>
             </v-container>
         </v-form>
+    <v-dialog
+        v-model="deleteDialog.show"
+        max-width="500"
+        transition="dialog-transition"
+    >
+    <v-card width='500px'>
+        <v-card-title primary-title>
+            Delete option: '{{deleteDialog.option.title}}'
+        </v-card-title>
+        <v-card-text>
+            Are you sure you want to delte this option?
+        </v-card-text>
+        <v-card-actions>
+            <v-btn color="success" @click='abortOptionDelete'>Cancel</v-btn>
+            <v-spacer></v-spacer>
+            <v-btn color="error" @click='commitOptionDelete'>Delete</v-btn>
+        </v-card-actions>
+    </v-card>
+        
+    </v-dialog>
     </div>
 </template>
 <script>
@@ -98,10 +96,19 @@ import {ProductModel} from '../../../system/db/models/productModel';
 import {mapActions}  from 'vuex'
 
 import { getProductById,deleteProductImage } from '../../../system/db/repos/product.repo'
+import CreateOption from '../../components/product/option/CreateOption.vue'
+import Option from '../../components/product/option/Option.vue'
 
 export default {
+    components: {CreateOption, Option},
     data() {
         return {
+            deleteDialog: {
+                show: false,
+                deleteIndex: -1,
+                option: {}
+            },
+            editingOption: -1,
             addingOption: false,
             showFileUploadDialog: false,
             newOption: {
@@ -109,17 +116,43 @@ export default {
                 value: 0
             },
             product : {
-                images: []
+                images: [],
+                options: []
             },
-            imageToUpload : {}
+            imageToUpload : {},
+            editorOption: {}
         }
     },
     props: ['id'],
     methods: {
+
+        commitOptionDelete(){
+            this.product.options.splice(this.deleteDialog.deleteIndex, 1)
+            this.abortOptionDelete()
+            this.updateProduct(this.product)
+        },
+        abortOptionDelete(){
+            this.deleteDialog = {
+                show: false,
+                deleteIndex: -1,
+                option: {}
+            }
+        },
+        promptOptionDelete(index){
+            this.deleteDialog.deleteIndex = index
+            this.deleteDialog.option = this.product.options[index],
+            this.deleteDialog.show = true
+        },
+
         createOption(){
             if(!this.addingOption) return this.addingOption = true
             this.product.options.push({...this.newOption})
             this.addingOption = false
+        },
+        saveOption(option){
+            this.product.options.push(option)
+            if(this.product.id != undefined)
+                this.updateProduct(this.product)
         },
         commitProduct(){
             if(this.product.id == undefined){
@@ -172,6 +205,9 @@ export default {
         flex-direction: column
         justify-content: center
         align-items: center
+    .option
+        max-width: 500px
+        margin: .5em
     .productImage
         position: relative
         .imageHover

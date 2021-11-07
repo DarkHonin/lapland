@@ -28,7 +28,8 @@
                         </p>
                     </v-col>
                     <v-col>
-                        
+                        <h5>Options</h5>
+                        <Option @change='optionChanged' v-for='(option, index) in product.options' :option='option' :key='index' />
                     </v-col>
                 </v-row>
             </v-container>
@@ -40,7 +41,7 @@
 import {ProductModel} from '../../../system/db/models/productModel';
 import {mapActions, mapGetters}  from 'vuex'
 import { getProductById } from '../../../system/db/repos/product.repo'
-
+import Option from '../../components/product/option/Option.vue'
 
 export default {
     data() {
@@ -53,8 +54,12 @@ export default {
             product: {}
         }
     },
+    components: {Option},
     props: ['id'],
     methods: {
+        optionChanged({option, value}){
+            console.log(option, value)
+        },
         editProduct(){
             this.$router.push(`/product/${this.product.id}/edit`)
         },
