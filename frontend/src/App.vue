@@ -19,6 +19,7 @@ export default {
     //
   }),
   beforeCreate() {
+    this.$store.dispatch('cart/initCart')
     const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
       this.$store.dispatch('refreshUser', user)

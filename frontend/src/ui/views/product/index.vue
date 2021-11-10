@@ -3,6 +3,10 @@
         <v-toolbar>
             <v-spacer />
             <v-btn v-if='isAdmin' rounded @click='editProduct(product)' >Edit</v-btn>
+            <v-btn rounded @click='addToCart(product)' >
+                Add to cart
+                <v-icon>mdi-cart-add</v-icon>
+            </v-btn>
         </v-toolbar>
         <v-divider />
         <v-row class='pa-5' align='center' id='imageRow'>
@@ -51,18 +55,34 @@ export default {
                 label: '',
                 value: 0
             },
-            product: {}
+            product: {},
+            selection: {}
         }
     },
     components: {Option},
     props: ['id'],
     methods: {
         optionChanged({option, value}){
-            console.log(option, value)
+            console.log(option)
+            this.selection[option.title] = {
+                title: option.title,
+                type: option.type,
+                value
+            }
         },
         editProduct(){
             this.$router.push(`/product/${this.product.id}/edit`)
         },
+        addToCart(){
+            const save = {
+                id : this.product.id,
+                title: this.product.title,
+                selection: Object.values(this.selection)
+            }
+            console.log(save)
+            this.$store.dispatch('cart/addItemToCart', save)
+            this.selection = []
+        }
     },
     created(){
         getProductById(this.id).then(product => this.product = product).catch(e => {

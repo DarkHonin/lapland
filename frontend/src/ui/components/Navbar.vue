@@ -27,6 +27,7 @@
                     </v-list>
                 </v-menu>
             </span>
+            <CartButton />
         </nav>
     </v-toolbar>
 </template>
@@ -35,6 +36,7 @@
 import {mapGetters, mapActions} from 'vuex'
 
 import DropdownItem from './navbar/DropdownItem.vue'
+import CartButton from './cart/CartButton.vue'
 
 export default {
     data(){
@@ -52,7 +54,7 @@ export default {
             }
         ]}
     },
-    components: {DropdownItem},
+    components: {DropdownItem, CartButton},
     computed: mapGetters(['getUser', 'getUserMessage']),
     methods: {...mapActions(['logout'])},
 }
