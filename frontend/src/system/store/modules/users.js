@@ -27,15 +27,15 @@ export default {
 
         },
 
-        async refreshUser({commit}, fireUser){
+        async refreshUser({commit, state}, fireUser){
             if(fireUser == null)
                 return commit('updateUser', {});
             const userDoc = await getDoc(doc(db, 'users', fireUser.uid))
             commit('updateUser', userDoc.data());
+            return state.user
         },
 
         async login({commit}, {email, password}){
-
             const auth = getAuth(); 
             const response = await signInWithEmailAndPassword(auth, email, password);
             console.log(`login complete`, response)
@@ -46,7 +46,7 @@ export default {
         async logout({commit}){
             console.log('Signing out')
             signOut(getAuth());
-            commit('updateUser', undefined)
+            commit('updateUser', {})
         },
     },
     mutations : {
@@ -54,7 +54,7 @@ export default {
             s.userMessage = message
         },
         updateUser(s, user){
-            s.user = user
+            s.user = new User({...user})
         }
     }
 }

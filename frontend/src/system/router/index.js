@@ -1,9 +1,14 @@
+import {app} from '../db/firebase'
+
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../../ui/views/Home.vue'
 
 import store from '../store/index'
 import products from './product'
+import order from './order'
+
+import {getAuth, onAuthStateChanged} from 'firebase/auth'
 
 Vue.use(VueRouter)
 
@@ -33,6 +38,7 @@ const routes = [
     }
   },
   ...products,
+  ...order,
   {
     path: '/register',
     name: 'Register',
@@ -56,14 +62,22 @@ const router = new VueRouter({
 
 
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const requiresAuth = to.matched.some(r => r.meta.requiresAuth)
   const requiresAdmin = to.matched.some(r => r.meta.requiresAdmin)
 
-  if(requiresAuth && store.getters.getUser == undefined) return next('/login')
-  if(requiresAdmin && !store.getters.getUser.isAdmin) return next('404')
-
-  next()
+  const heck = new Promise((yay, nay) => {
+    const auth = getAuth();
+    const dispatch = onAuthStateChanged(auth, (user) => {
+        dispatch()
+        yay(store.dispatch('refreshUser', user))
+    })
+  }).then(user => {
+    console.log('----',user)
+    if(requiresAuth && (user == undefined || user.uid == undefined)) return next({path: '/login', query: {returnTo: to.path}})
+    if(requiresAdmin && !user.isAdmin) return next('404')
+    next()
+  })
 })
 
 export default router

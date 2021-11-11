@@ -50,7 +50,12 @@ export default {
         login(){
             this.loading = true
             console.log(`Logging into account: ${this.user.email}`)
-            this.$store.dispatch('login', this.user).then(() => this.$router.push('/'))
+            this.$store.dispatch('login', this.user).then(() => {
+                if(this.$route.query.returnTo)
+                    this.$router.push(this.$route.query.returnTo)
+                else
+                    this.$router.push('/')
+                })
             .catch(error => {
                 if(error.code == 'auth/wrong-password')
                     this.error = 'Incorrect email/password'        
