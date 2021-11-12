@@ -1,7 +1,7 @@
 <template>
     <div>
-
         <v-dialog v-model="showFileUploadDialog" width="500">
+            <!-- Dialog for the file upload -->
             <v-card>
                 <v-card-title class="text-h5 grey lighten-2">
                 Upload File
@@ -27,19 +27,36 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="deleteDialog.show" max-width="500" transition="dialog-transition">
+            <!-- Delete option dialog -->
+            <v-card width='500px'>
+                <v-card-title primary-title>
+                    Delete option: '{{deleteDialog.option.title}}'
+                </v-card-title>
+                <v-card-text>
+                    Are you sure you want to delte this option?
+                </v-card-text>
+                <v-card-actions>
+                    <v-btn color="success" @click='abortOptionDelete'>Cancel</v-btn>
+                    <v-spacer></v-spacer>
+                    <v-btn color="error" @click='commitOptionDelete'>Delete</v-btn>
+                </v-card-actions>
+            </v-card>
+                
+            </v-dialog>
 
         <v-toolbar>
             <v-toolbar-title>{{product.id == undefined ? 'Create' : 'Update'}} Product</v-toolbar-title>
             <v-spacer />
-            <v-btn rounded @click='commitProduct'>Save</v-btn>
+            <v-btn rounded @click='save()'>Save</v-btn>
         </v-toolbar>
         <v-divider />
         <v-row class='pa-5' align='center' id='imageRow'>
-            <v-card class='pa-5' id='addImage' width='300' height='300' outlined rounded @click='showFileUploadDialog = true'>
+            <v-card class='pa-5' id='addImage' min-width='300' min-height='300' outlined rounded @click='showFileUploadDialog = true'>
                 <v-icon size='50'>mdi-plus</v-icon>
                 <v-card-title>Add Image</v-card-title>
             </v-card>
-            <v-card class='productImage' :key='index' v-for='(img, index) in product.images' width='300' height='300' outlined rounded>
+            <v-card class='productImage' :key='index' v-for='(img, index) in product.images' width='300' height='300' min-width='300' outlined rounded>
                 <v-img :src='img.url' height='100%' />
                 <div class='imageHover'>
                     <v-btn @click='deleteImage(img)' color="error">Delete</v-btn>
@@ -57,37 +74,21 @@
                     </v-col>
                     <v-col>
                         <h4>Options</h4>
-                        <Option class='option' :option='option' v-for='(option, key) in product.options' :key='key'>
-                            <template v-slot:actions>
-                                <v-icon @click='promptOptionDelete(key)' color='error'>mdi-delete</v-icon>
-                            </template>
-
-                        </Option>
+                        <div v-for='(option, key) in product.options' :key='key'>
+                            <CreateOption class='option' :option='option' v-if='key == editingOptionIndex' @submit='(v) => saveOption(v, key)'/>    
+                            <Option v-else class='option' :option='option' >
+                                <template v-slot:actions>
+                                    <v-icon class='mr-2' @click='editingOptionIndex = key'>mdi-pencil</v-icon>
+                                    <v-icon @click='promptOptionDelete(key)' color='error'>mdi-delete</v-icon>
+                                </template>
+                            </Option>
+                        </div>
                         <CreateOption class='option' @submit='(v) => saveOption(v)'/>
                     </v-col>
                 </v-row>
             </v-container>
         </v-form>
-    <v-dialog
-        v-model="deleteDialog.show"
-        max-width="500"
-        transition="dialog-transition"
-    >
-    <v-card width='500px'>
-        <v-card-title primary-title>
-            Delete option: '{{deleteDialog.option.title}}'
-        </v-card-title>
-        <v-card-text>
-            Are you sure you want to delte this option?
-        </v-card-text>
-        <v-card-actions>
-            <v-btn color="success" @click='abortOptionDelete'>Cancel</v-btn>
-            <v-spacer></v-spacer>
-            <v-btn color="error" @click='commitOptionDelete'>Delete</v-btn>
-        </v-card-actions>
-    </v-card>
-        
-    </v-dialog>
+    
     </div>
 </template>
 <script>
@@ -120,7 +121,7 @@ export default {
                 options: []
             },
             imageToUpload : {},
-            editorOption: {}
+            editingOptionIndex: -1
         }
     },
     props: ['id'],
@@ -149,18 +150,25 @@ export default {
             this.product.options.push({...this.newOption})
             this.addingOption = false
         },
-        saveOption(option){
-            this.product.options.push(option)
+        saveOption(option, key = -1){
+            if(key == -1)
+                this.product.options.push(option)
+            else
+                this.product.options[key] = option
+            if(this.editingOptionIndex != -1) this.editingOptionIndex = -1
             if(this.product.id != undefined)
                 this.updateProduct(this.product)
         },
+        save(){
+          this.commitProduct().then( (product) => {
+              this.$router.push(`/product/${product.id}`)
+          })
+        },
         commitProduct(){
             if(this.product.id == undefined){
-                this.createProduct(this.product).then(savedProduct => {
-                    this.$router.push(`/product/${savedProduct.id}`)
-                })
+                return this.createProduct(this.product)
             }else{
-                this.updateProduct(this.product)
+                return this.updateProduct(this.product)
             }
         },
         commitNewImage(){
@@ -180,7 +188,7 @@ export default {
             if(this.product.id != undefined)
                 this.updateProduct(this.product)
         },
-        ...mapActions(['createProduct', 'updateProduct', 'createProductImage'])
+        ...mapActions({createProduct: 'products/createProduct', updateProduct: 'products/updateProduct', createProductImage: 'products/createProductImage'})
     },
     created() {
         if(this.id == undefined){

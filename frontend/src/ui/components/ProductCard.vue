@@ -6,7 +6,7 @@
                     <span>{{product.title}}</span>
                     <v-spacer />
                     <span>
-                        $##,##
+                       R {{product.getMinPrice()}} - {{product.getMaxPrice()}} 
                     </span>
                 </v-list-item-title>
                 <v-list-item-subtitle>
@@ -23,11 +23,8 @@
             </v-list-item-avatar>
         </v-list-item>
             <v-card-actions>
-                
-                    <v-btn outlined rounded text @click='navToProduct'> View </v-btn>
-                    </spacer>
-                    <v-btn outlined rounded text v-if='isAdmin' color='error'> Delete </v-btn>
-                
+                <v-btn outlined rounded text @click='navToProduct'> View </v-btn>
+                <v-btn outlined rounded text @click=''> <v-icon>mdi-cart-plus</v-icon> </v-btn>
             </v-card-actions>
     </v-card>
 
@@ -38,11 +35,6 @@ export default {
     methods: {
         navToProduct(id){
             this.$router.push(`/product/${this.product.id}`)
-        }
-    },
-    computed:{
-        isAdmin(){
-            return this.$store.getters.getUser.isAdmin
         }
     }
 }

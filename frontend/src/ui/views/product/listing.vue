@@ -1,9 +1,5 @@
 <template lang="">
     <div>
-        <v-toolbar>
-            <v-spacer/>
-            <router-link to='/product'><v-btn color="primairy" text><v-icon>mdi-add</v-icon></v-btn></router-link>    
-        </v-toolbar>
         <v-container grid-list-xs>
             <v-list v-if='products != undefined'>
                 <ProductCard v-for='(product, index) in products' :product='product' :key='index'/>
@@ -22,11 +18,11 @@ export default {
     data() {
         return {}
     },
-    methods: mapActions(['loadProducts']),
+    methods: mapActions({loadProducts : 'products/loadProducts'}),
     created(){
         this.loadProducts()
     },
-    computed: mapGetters(['products', 'isAdmin']),
+    computed: mapGetters({products: 'products/products'}),
 }
 </script>
 <style lang="">

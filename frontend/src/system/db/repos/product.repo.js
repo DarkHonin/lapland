@@ -15,7 +15,8 @@ export async function getProductById(productId){
 }
 
 export async function updateProduct(productModel){
-    await updateDoc(doc(db, 'products', productModel.id), productModel)
+    console.log(productModel.toMap())
+    await updateDoc(doc(db, 'products', productModel.id), productModel.toMap())
 }
 
 export async function uploadProductImage(imageFile){
@@ -37,7 +38,7 @@ export async function uploadProductImage(imageFile){
 
 export async function deleteProductImage(image){
     const sRef = ref(storage, image.ref)
-    await deleteObject(sRef)
+    await deleteObject(sRef).catch(error => console.log(error))
 }
 
 export async function createProduct(productModel){

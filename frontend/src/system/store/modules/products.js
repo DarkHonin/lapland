@@ -4,6 +4,7 @@ import { infoEntity } from "./entities/info";
 import { createProduct as repoCreateProduct, updateProduct as repoUpdateProduct, uploadProductImage, fetchAllProducts} from "../../db/repos/product.repo";
 
 export default {
+    namespaced: true,
     state: {
         products: [],
         productsStateMessages: new infoEntity({message: 'Info entity startup'})
@@ -22,6 +23,7 @@ export default {
             commit('updateProductsInfo', {message : `Updating product: ${product.title}`})
             await repoUpdateProduct(product)
             commit('updateProductsInfo', {message : `Updated product: ${product.title}`})
+            return product
         },
 
         async createProductImage({commit}, image){

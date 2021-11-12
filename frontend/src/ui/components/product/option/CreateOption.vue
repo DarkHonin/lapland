@@ -1,5 +1,5 @@
 <template lang="">
-    <v-card v-if='option'>
+    <v-card>
         <v-col>            
             <v-row class='px-5' id='optionHeader'>
                 <v-text-field  v-model='option.title' ref='title' name="optionTitle" label="Option title"></v-text-field>
@@ -43,15 +43,17 @@
 </template>
 <script>
 export default {
-    // props: {
-    //     option: {
-    //         dafault: () => {return {
-    //             title: '',
-    //             type: '',
-    //             select: []
-    //         }},
-    //     }
-    // },
+    props: {
+        option: {
+            default: function () {
+                return {
+                    title: '',
+                    type: '',
+                    select: []
+                }
+            },
+        }
+    },
     data() {
         return {
             creatingSelect: false,
@@ -69,11 +71,11 @@ export default {
                 title: '',
                 price: 0
             },
-            option: {
-                title: '',
-                type: '',
-                select: []
-            }
+            // option: {
+            //     title: '',
+            //     type: '',
+            //     select: []
+            // }
             // validation :{
             //     select: {
             //         title: [
@@ -91,11 +93,6 @@ export default {
     methods: {
         save(){
             this.$emit('submit', this.option)
-            this.option = {
-                title: '',
-                type: '',
-                select: []
-            }
         },
         saveSelect(){
             // Object.keys(this.select).forEach(k => {

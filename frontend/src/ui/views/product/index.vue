@@ -1,11 +1,11 @@
 <template>
     <div>
         <v-toolbar>
+            <v-btn v-if='isAdmin' color="primary" rounded @click='editProduct(product)' >Edit</v-btn>
             <v-spacer />
-            <v-btn v-if='isAdmin' rounded @click='editProduct(product)' >Edit</v-btn>
             <v-btn rounded @click='addToCart(product)' >
                 Add to cart
-                <v-icon>mdi-cart-add</v-icon>
+                <v-icon class='ml-2'>mdi-cart-plus</v-icon>
             </v-btn>
         </v-toolbar>
         <v-divider />
