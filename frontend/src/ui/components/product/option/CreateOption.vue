@@ -1,5 +1,5 @@
 <template lang="">
-    <v-card>
+    <v-card width='400'>
         <v-col>            
             <v-row class='px-5' id='optionHeader'>
                 <v-text-field  v-model='option.title' ref='title' name="optionTitle" label="Option title"></v-text-field>

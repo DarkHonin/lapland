@@ -46,6 +46,7 @@ export default {
         },
         loadFromCookies(){
             const cartJson = jsCookie.get('cart')
+            if(!cartJson) return this.state.cart = [] 
             this.state.cart = JSON.parse(cartJson)
         },
         saveToCookies(){

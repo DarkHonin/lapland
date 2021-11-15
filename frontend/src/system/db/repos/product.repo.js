@@ -15,7 +15,6 @@ export async function getProductById(productId){
 }
 
 export async function updateProduct(productModel){
-    console.log(productModel.toMap())
     await updateDoc(doc(db, 'products', productModel.id), productModel.toMap())
 }
 
@@ -42,24 +41,25 @@ export async function deleteProductImage(image){
 }
 
 export async function createProduct(productModel){
-    
-    const data = {};
-    Object.keys(productModel).map(v =>{
-            if(productModel[v] != undefined)
-                data[v] = productModel[v]
-        })
-
+    const data = productModel.toMap()
     const ref = await addDoc(productCollection(), data)
     data.id = ref.id
     await updateDoc(ref, {id : data.id})
+
+    getDoc(doc(db, 'analytics', 'products')).then(snap => {
+        const data = snap.data()
+        console.log(data)
+        updateDoc(snap.ref, {totalProducts: data.totalProducts +1})
+    })
+
+
     return new ProductModel({...data});
-} 
+}
 
 export async function fetchAllProducts(){
     
     const snap = await getDocs(productCollection())
     const ret = []
     snap.forEach(d => ret.push(new ProductModel({...d.data()})))   
-    console.log(ret)
     return ret;
 }

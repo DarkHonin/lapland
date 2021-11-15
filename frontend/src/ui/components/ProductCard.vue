@@ -24,7 +24,6 @@
         </v-list-item>
             <v-card-actions>
                 <v-btn outlined rounded text @click='navToProduct'> View </v-btn>
-                <v-btn outlined rounded text @click=''> <v-icon>mdi-cart-plus</v-icon> </v-btn>
             </v-card-actions>
     </v-card>
 

@@ -2,6 +2,7 @@ const schema = {
     id: '',
     title: '',
     description: '',
+    published: false,
     images: [
         {
             url: 'url to image',
@@ -24,10 +25,10 @@ const schema = {
     ]
 }
 
-export function ProductModel({id, title, description, images=[], options=[]}){
+export function ProductModel({id, title, description, images=[], options=[], published=false}){
     return {
         id, title, description, images, 
-        options,
+        options, published,
         getMaxPrice(){
             var tVal = 0
             options.forEach( option => {
@@ -47,7 +48,6 @@ export function ProductModel({id, title, description, images=[], options=[]}){
                 var holdV = Number.MAX_SAFE_INTEGER
                 if(option.type == 'singleSelect'){
                     option.select.forEach(select => {
-                        console.log(select, Number(select.price))
                         holdV = Math.min(holdV, Number(select.price))
                     })
                     tVal += holdV
@@ -57,7 +57,11 @@ export function ProductModel({id, title, description, images=[], options=[]}){
         },
         toMap(){
             const toSave = {}
-            Object.keys(schema).forEach(key => toSave[key] = this[key])
+            Object.keys(schema).forEach(key => {
+                if(this[key] != undefined)
+                    toSave[key] = this[key]
+            })
+            console.log(toSave)
             return toSave
         }
     }

@@ -46,7 +46,7 @@
             </v-dialog>
 
         <v-toolbar>
-            <v-toolbar-title>{{product.id == undefined ? 'Create' : 'Update'}} Product</v-toolbar-title>
+            <v-switch style='padding-top: 20px' class='mr-2' label="Published" v-model="product.published"></v-switch>
             <v-spacer />
             <v-btn rounded @click='save()'>Save</v-btn>
         </v-toolbar>

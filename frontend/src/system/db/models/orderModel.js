@@ -6,7 +6,11 @@ const ORDER_STATUS = {
 
 
 const structure = {
-    cart: [], // The items ordered, see ui/views/product/index:59
+    cart: [
+        {
+            title: ''
+        }
+    ], // The items ordered, see ui/views/product/index:59
     createdAt: 'Datetime stamp of created',
     updatedAt: 'Datetime stamp of changed', // add to object {created: firebase.database.ServerValue.TIMESTAMP}
     status: ORDER_STATUS.STATUS_PENDING,

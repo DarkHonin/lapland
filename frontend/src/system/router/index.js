@@ -73,7 +73,6 @@ router.beforeEach(async (to, from, next) => {
         yay(store.dispatch('refreshUser', user))
     })
   }).then(user => {
-    console.log('----',user)
     if(requiresAuth && (user == undefined || user.uid == undefined)) return next({path: '/login', query: {returnTo: to.path}})
     if(requiresAdmin && !user.isAdmin) return next('404')
     next()

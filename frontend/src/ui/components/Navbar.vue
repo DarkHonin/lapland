@@ -28,7 +28,8 @@
                         </v-btn>
                     </template>
                     <v-list>
-                    <DropdownItem v-for="(item, index) in items" :item='item' :key="index"/>
+                        <DropdownItem v-if='getUser.uid' :item='dashboardRoute' />
+                        <DropdownItem v-for="(item, index) in items" :item='item' :key="index"/>
                     </v-list>
                 </v-menu>
             </span>
@@ -44,19 +45,26 @@ import CartButton from './cart/CartButton.vue'
 
 export default {
     data(){
-        return {items: [
-            {
-                title: 'Profile',
-                icon: 'account',
-                action: (context) => context.$router.push('/profile')
-            },
-            {
-                title: 'Logout',
-                action: (context) => {
-                    context.$store.dispatch('logout').then(() => context.$router.push('/'))
+        return {
+            items: [
+                {
+                    title: 'Profile',
+                    icon: 'account',
+                    action: (context) => context.$router.push('/profile')
+                },
+                {
+                    title: 'Logout',
+                    action: (context) => {
+                        context.$store.dispatch('logout').then(() => context.$router.push('/'))
+                    }
                 }
-            }
-        ]}
+            ],
+            dashboardRoute: {
+                    title: 'Dashboard',
+                    action: (context) => context.$router.push('/dashboard'),
+                    icon: 'dashboard'
+                }
+        }
     },
     components: {DropdownItem, CartButton},
     computed: mapGetters(['getUser', 'getUserMessage']),

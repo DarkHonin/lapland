@@ -33,7 +33,11 @@
                     </v-col>
                     <v-col>
                         <h5>Options</h5>
-                        <Option @change='optionChanged' v-for='(option, index) in product.options' :option='option' :key='index' />
+                        <Option @change='optionChanged' v-for='(option, index) in product.options' :option='option' :key='index'>
+                            <template v-slot:error='{item}'>
+                                <span v-if='errors[item.title]' style='' class='ma-auto optionError'>{{errors[item.title]}}</span>
+                            </template>
+                        </Option>
                     </v-col>
                 </v-row>
             </v-container>
@@ -56,14 +60,14 @@ export default {
                 value: 0
             },
             product: {},
-            selection: {}
+            selection: {},
+            errors: {}
         }
     },
     components: {Option},
     props: ['id'],
     methods: {
         optionChanged({option, value}){
-            console.log(option)
             this.selection[option.title] = {
                 title: option.title,
                 type: option.type,
@@ -74,12 +78,20 @@ export default {
             this.$router.push(`/product/${this.product.id}/edit`)
         },
         addToCart(){
+            var abort = false
+            this.product.options.forEach(e => {
+                if(e.type == 'singleSelect' && !this.selection[e.title]){
+                    this.errors[e.title] = `Please select one`
+                    abort = true
+                }
+            })
+            this.$forceUpdate()
+            if(abort) return
+            this.errors = {}
             const save = {
-                id : this.product.id,
-                title: this.product.title,
+                product: this.product,
                 selection: Object.values(this.selection)
             }
-            console.log(save)
             this.$store.dispatch('cart/addItemToCart', save)
             this.selection = []
         }
@@ -106,6 +118,8 @@ export default {
         align-items: center
     .productImage
         position: relative
-        
-
+    .optionError
+        color: red
+        display: block
+        width: fit-content
 </style>
